@@ -139,6 +139,30 @@ void main() {
         expect(limiter.statistics.permitsRejected, 1);
       });
 
+      test('returns false when blocked waiters are queued (FIFO fairness)', () {
+        final limiter = TokenBucketRateLimiter(
+          capacity: 3,
+          refillAmount: 3,
+          refillInterval: const Duration(hours: 1),
+          initialTokens: 0,
+        );
+
+        // Enqueue a waiter without awaiting — queue is now non-empty.
+        limiter.acquire().ignore();
+        expect(limiter.statistics.queueDepth, 1);
+
+        // Even though tokens may exist after refill, tryAcquire must yield
+        // to the queued waiter — otherwise fairness is violated.
+        expect(
+          limiter.tryAcquire(),
+          isFalse,
+          reason: 'tryAcquire must not steal permits from queued waiters',
+        );
+        expect(limiter.statistics.permitsRejected, 1);
+        // Dispose inline to avoid unhandled errors from the pending waiter.
+        limiter.dispose();
+      });
+
       test('throws StateError after dispose', () {
         final limiter = TokenBucketRateLimiter(
           capacity: 5,

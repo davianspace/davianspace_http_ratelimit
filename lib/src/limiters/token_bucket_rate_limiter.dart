@@ -84,6 +84,12 @@ final class TokenBucketRateLimiter extends RateLimiter {
   @override
   bool tryAcquire() {
     _checkDisposed();
+    // When blocked callers are queued, deny non-blocking attempts so that
+    // queued waiters are not starved (FIFO fairness).
+    if (_queue.isNotEmpty) {
+      _permitsRejected++;
+      return false;
+    }
     if (_tokens > 0) {
       _tokens--;
       _permitsAcquired++;

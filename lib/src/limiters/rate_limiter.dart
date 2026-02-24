@@ -94,6 +94,20 @@ abstract class RateLimiter {
   /// instance on every call. Callers must not cache the result.
   RateLimiterStatistics get statistics;
 
+  /// Signals that a previously acquired permit has been consumed (i.e. the
+  /// associated work is complete).
+  ///
+  /// The default implementation is a **no-op** for non-concurrency limiters
+  /// (Token Bucket, Fixed Window, Sliding Window, Leaky Bucket) where permits
+  /// are consumed at acquisition time and do not need to be returned.
+  ///
+  /// `ConcurrencyLimiter` overrides this to decrement the in-flight counter
+  /// and wake any blocked [acquire] waiters.
+  ///
+  /// `HttpRateLimitHandler` calls this automatically in a `try/finally` block
+  /// after the inner handler completes.
+  void release() {}
+
   /// Releases all internal resources.
   ///
   /// After calling [dispose]:

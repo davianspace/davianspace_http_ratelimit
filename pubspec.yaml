@@ -1,23 +1,19 @@
 name: davianspace_http_ratelimit
-description: >-
-  Enterprise-grade client-side HTTP rate-limiting for the
-  davianspace_http_resilience pipeline. Provides Token Bucket, Fixed Window,
-  Sliding Window, and Leaky Bucket algorithms plus HttpRateLimitHandler
-  for drop-in pipeline integration.
+description: Enterprise-grade HTTP rate limiting for Dart & Flutter with six algorithms, client/server pipelines, key-based admission control, and pluggable storage backends.
 version: 1.0.0
-publish_to: none
 homepage: https://github.com/davianspace/davianspace_http_ratelimit
 repository: https://github.com/davianspace/davianspace_http_ratelimit
 issue_tracker: https://github.com/davianspace/davianspace_http_ratelimit/issues
+license: MIT
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
-  davianspace_http_resilience:
-    path: ../davianspace_http_resilience
+  davianspace_http_resilience: ^1.0.1
   meta: "^1.12.0"
 
 dev_dependencies:
-  lints: "^3.0.0"
-  test: "^1.24.0"
+  fake_async: "^1.3.1"
+  lints: "^6.1.0"
+  test: "^1.25.2"

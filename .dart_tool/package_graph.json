@@ -11,6 +11,7 @@
         "meta"
       ],
       "devDependencies": [
+        "fake_async",
         "lints",
         "test"
       ]
@@ -48,8 +49,16 @@
     },
     {
       "name": "lints",
-      "version": "3.0.0",
+      "version": "6.1.0",
       "dependencies": []
+    },
+    {
+      "name": "fake_async",
+      "version": "1.3.3",
+      "dependencies": [
+        "clock",
+        "collection"
+      ]
     },
     {
       "name": "meta",
@@ -58,7 +67,7 @@
     },
     {
       "name": "davianspace_http_resilience",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "dependencies": [
         "http",
         "logging",
@@ -312,6 +321,11 @@
         "watcher",
         "yaml"
       ]
+    },
+    {
+      "name": "clock",
+      "version": "1.1.2",
+      "dependencies": []
     },
     {
       "name": "logging",

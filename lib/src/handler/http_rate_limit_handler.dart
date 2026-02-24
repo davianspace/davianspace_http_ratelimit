@@ -62,13 +62,19 @@ final class HttpRateLimitHandler extends DelegatingHandler {
 
     await _acquirePermit(context);
 
-    final response = await innerHandler.send(context);
+    try {
+      final response = await innerHandler.send(context);
 
-    if (_policy.respectServerHeaders) {
-      _inspectServerHeaders(response, context);
+      if (_policy.respectServerHeaders) {
+        _inspectServerHeaders(response, context);
+      }
+
+      return response;
+    } finally {
+      // No-op for time-windowed limiters; releases the in-flight slot for
+      // ConcurrencyLimiter.
+      _policy.limiter.release();
     }
-
-    return response;
   }
 
   // ─────────────────────────────────────────────────────────────────────────
