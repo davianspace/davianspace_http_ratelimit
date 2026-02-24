@@ -6,6 +6,13 @@ repository: https://github.com/davianspace/davianspace_http_ratelimit
 issue_tracker: https://github.com/davianspace/davianspace_http_ratelimit/issues
 license: MIT
 
+topics: 
+  - rate-limiting
+  - throttling
+  - flutter
+  - architecture
+  - observability
+
 environment:
   sdk: ">=3.0.0 <4.0.0"
 
