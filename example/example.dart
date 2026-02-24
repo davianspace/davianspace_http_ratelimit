@@ -287,7 +287,6 @@ Future<void> _example8ServerSideCompositeKey() async {
   );
 
   // Composite key: user-id + path, joined by the default ':' separator.
-  // ignore: prefer_const_constructors
   final extractor = CompositeKeyExtractor(
     [
       const UserKeyExtractor(),
@@ -348,15 +347,12 @@ void _example9PipelineIntegration() {
     '  Limiter stats: ${limiter.statistics.currentPermits}/'
     '${limiter.statistics.maxPermits} tokens available',
   );
-
-  // In production you would call:
-  //   final response = await client.send(ctx);
-  // The handler acquires a token before forwarding and releases it after.
-  // When respectServerHeaders = true, parsed RateLimitHeaders are stored in
-  // the HttpContext and accessible after the response:
-  //   final headers = ctx.getProperty<RateLimitHeaders>(
-  //     HttpRateLimitHandler.rateLimitHeadersPropertyKey,
-  //   );
+  // When the client processes a request, the handler acquires a token before
+  // forwarding to the next handler and releases it afterwards.  If a token
+  // cannot be acquired within acquireTimeout, the request is short-circuited
+  // and onRejected is invoked.  When respectServerHeaders is true, parsed
+  // RateLimitHeaders are stored on the HttpContext under
+  // HttpRateLimitHandler.rateLimitHeadersPropertyKey after each response.
 
   client.dispose();
   limiter.dispose();
