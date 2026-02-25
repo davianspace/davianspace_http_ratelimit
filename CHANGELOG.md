@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.3] — 2026-02-25
+
+### Added
+
+- **`davianspace_dependencyinjection` integration** — `davianspace_dependencyinjection ^1.0.3`
+  is now a runtime dependency. New extension methods on `ServiceCollection`:
+  - `addRateLimiter<TLimiter>(limiter)` — registers a pre-constructed limiter as both its concrete type and `RateLimiter`.
+  - `addTokenBucketRateLimiter(capacity, refillAmount, refillInterval, [initialTokens])` — singleton `TokenBucketRateLimiter`.
+  - `addFixedWindowRateLimiter(maxPermits, windowDuration)` — singleton `FixedWindowRateLimiter`.
+  - `addSlidingWindowRateLimiter(maxPermits, windowDuration)` — singleton `SlidingWindowRateLimiter`.
+  - `addSlidingWindowLogRateLimiter(maxPermits, windowDuration)` — singleton `SlidingWindowLogRateLimiter`.
+  - `addLeakyBucketRateLimiter(capacity, leakInterval)` — singleton `LeakyBucketRateLimiter`.
+  - `addConcurrencyLimiter(maxConcurrency)` — singleton `ConcurrencyLimiter`.
+  - `addServerRateLimiter(limiterFactory, [acquireTimeout])` — singleton `ServerRateLimiter`. All methods use try-add semantics.
+
+### Changed
+
+- **Removed `meta` dependency** — `@immutable` and `@internal` annotations dropped; `final class` already enforces immutability in Dart 3.
+- `davianspace_http_resilience` minimum version raised to `^1.0.3`.
+
+---
+
 ## [1.0.0] — 2026-02-24
 
 ### Added

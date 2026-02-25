@@ -60,6 +60,8 @@ library;
 export 'src/backend/in_memory_rate_limiter_repository.dart';
 export 'src/backend/rate_limiter_repository.dart';
 export 'src/exceptions/rate_limit_exceeded_exception.dart';
+// DI integration — ServiceCollection extensions for rate limiters
+export 'src/extensions/http_ratelimit_di_extensions.dart';
 export 'src/handler/http_client_builder_extension.dart';
 export 'src/handler/http_rate_limit_handler.dart';
 export 'src/handler/rate_limit_policy.dart';

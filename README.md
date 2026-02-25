@@ -38,10 +38,12 @@ pluggable backend, strict null-safety, and zero reflection.
   - [Custom Backend Repository](#custom-backend-repository)
   - [Statistics & Observability](#statistics--observability)
   - [Handling Rate Limit Exceeded](#handling-rate-limit-exceeded)
+- [DI Container Integration](#di-container-integration)
 - [Lifecycle & Disposal](#lifecycle--disposal)
 - [Testing](#testing)
 - [Architecture](#architecture)
 - [API Reference](#api-reference)
+- [Migration Guide](#migration-guide)
 - [Contributing](#contributing)
 - [Security](#security)
 - [License](#license)
@@ -80,8 +82,10 @@ pluggable backend, strict null-safety, and zero reflection.
 ## Requirements
 
 - **Dart SDK** `>=3.0.0 <4.0.0`
-- [`davianspace_http_resilience`](https://pub.dev/packages/davianspace_http_resilience) `^1.0.1`
+- [`davianspace_http_resilience`](https://pub.dev/packages/davianspace_http_resilience) `^1.0.3`
   (required only for `HttpRateLimitHandler`; core limiters have no HTTP dependency)
+- [`davianspace_dependencyinjection`](https://pub.dev/packages/davianspace_dependencyinjection) `^1.0.3`
+  (optional — needed only for DI container integration)
 
 ---
 
@@ -89,7 +93,7 @@ pluggable backend, strict null-safety, and zero reflection.
 
 ```yaml
 dependencies:
-  davianspace_http_ratelimit: ^1.0.0
+  davianspace_http_ratelimit: ^1.0.3
 ```
 
 ```bash
@@ -544,6 +548,54 @@ try {
 
 ---
 
+## DI Container Integration
+
+`davianspace_dependencyinjection ^1.0.3` is a runtime dependency. Extension
+methods on `ServiceCollection` register all limiter types and `ServerRateLimiter`
+as singletons with try-add semantics.
+
+```dart
+import 'package:davianspace_dependencyinjection/davianspace_dependencyinjection.dart';
+import 'package:davianspace_http_ratelimit/davianspace_http_ratelimit.dart';
+
+final provider = ServiceCollection()
+  // Register an algorithm:
+  ..addTokenBucketRateLimiter(
+    capacity: 100,
+    refillAmount: 10,
+    refillInterval: const Duration(seconds: 1),
+  )
+  // Register a server-side gate:
+  ..addServerRateLimiter(
+    limiterFactory: () => FixedWindowRateLimiter(
+      maxPermits: 200,
+      windowDuration: const Duration(minutes: 1),
+    ),
+    acquireTimeout: const Duration(milliseconds: 500),
+  )
+  .buildServiceProvider();
+
+final limiter = provider.getRequired<TokenBucketRateLimiter>();
+final server  = provider.getRequired<ServerRateLimiter>();
+```
+
+### DI Method Reference
+
+| Method | Registers |
+|--------|-----------|
+| `addRateLimiter<T>(instance)` | Pre-built limiter as both `T` and `RateLimiter` |
+| `addTokenBucketRateLimiter(...)` | Singleton `TokenBucketRateLimiter` |
+| `addFixedWindowRateLimiter(...)` | Singleton `FixedWindowRateLimiter` |
+| `addSlidingWindowRateLimiter(...)` | Singleton `SlidingWindowRateLimiter` |
+| `addSlidingWindowLogRateLimiter(...)` | Singleton `SlidingWindowLogRateLimiter` |
+| `addLeakyBucketRateLimiter(...)` | Singleton `LeakyBucketRateLimiter` |
+| `addConcurrencyLimiter(...)` | Singleton `ConcurrencyLimiter` |
+| `addServerRateLimiter(...)` | Singleton `ServerRateLimiter` |
+
+All methods are no-ops if the type is already registered.
+
+---
+
 ## Lifecycle & Disposal
 
 Every `RateLimiter`, `RateLimiterRepository`, and `ServerRateLimiter` must be
@@ -717,3 +769,22 @@ deployments.
 ## License
 
 [MIT License](LICENSE) — Copyright (c) 2026 DavianSpace
+
+---
+
+## Migration Guide
+
+### From 1.0.0 → 1.0.3
+
+**No breaking changes.** Version 1.0.3 is fully backward-compatible.
+
+New features available after upgrading:
+
+1. **DI container integration** — `davianspace_dependencyinjection ^1.0.3` is now
+   a runtime dependency. All limiter types and `ServerRateLimiter` can be
+   registered and injected via `ServiceCollection`. Existing code not using DI
+   is completely unaffected.
+2. **`meta` removed** — `@immutable`/`@internal` annotations dropped. No source
+   changes needed.
+3. **Companion packages updated** — `davianspace_http_resilience` minimum
+   raised to `^1.0.3`.
